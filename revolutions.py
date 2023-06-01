@@ -5,28 +5,30 @@ import math
 from math import pi
 
 
-def find_axis(ps):
-    # get single highest or a pair of highest points
+def find_axis_vertical(ps: list):
+    """ Get the axis of rotation for a set of points. Only works for completely vertical axes.
+
+    :param ps: a list containing the points to get the rotation axis for
+    :return: a point that represents the axis found
+    """
     max_x_1 = -1
     max_z_1 = -1
     max_x_2 = -1
     max_z_2 = -1
-    if isinstance(ps, list):
-        for p in ps:
-            if isinstance(p, Point):
-                if p.z >= max_z_1:
-                    max_z_2 = max_z_1
-                    max_x_2 = max_x_1
-                    max_z_1 = p.z
-                    max_x_1 = p.x
-                elif p.z >= max_z_2:
-                    max_z_2 = p.z
-                    max_x_2 = p.x
-            else:
-                raise TypeError
-    else:
-        raise TypeError
+    for p in ps:
+        if isinstance(p, Point):
+            if p.z >= max_z_1:
+                max_z_2 = max_z_1
+                max_x_2 = max_x_1
+                max_z_1 = p.z
+                max_x_1 = p.x
+            elif p.z >= max_z_2:
+                max_z_2 = p.z
+                max_x_2 = p.x
+        else:
+            raise TypeError
 
+    # use the two highest points if they have equal z, or use the highest point
     if max_z_1 == max_z_2:
         x = (max_x_1 + max_x_2) / 2
     else:
@@ -36,6 +38,13 @@ def find_axis(ps):
 
 
 def revolve(p, center, scale):
+    """ creates a circle of points by rotating a given point around an axis
+
+    :param p: the original point that is rotated
+    :param center: the axis to rotate around
+    :param scale: the amount of points created by the rotation
+    :return: a list of points created by rotating p around center
+    """
     r = p.dist2D(center)
     ps = [p]
     for i in np.arange(0, 2*pi, (2*pi)/scale):
@@ -50,7 +59,13 @@ def revolve(p, center, scale):
 
 
 def revolve_all(ps, scale):
-    axis = find_axis(ps)
+    """ creates a solid of revolution from a list of points
+
+    :param ps: the points to turn into a solid of revolution
+    :param scale: the amount of points in each band that forms the solid
+    :return: a list of Points representing the solid of revolution
+    """
+    axis = find_axis_vertical(ps)
     px = []
     for p in ps:
         px += revolve(p, axis, scale)
