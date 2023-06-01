@@ -58,4 +58,24 @@ def convert_points(ps):
         raise TypeError
 
 
+def rasterize(ps: list, sample: int):
+    for p in ps:
+        x = p.x
+        y = p.y
+        new_x = __int_round(x, sample)
+        new_y = __int_round(y, sample)
+        p.x = new_x
+        p.y = new_y
+
+
+def __int_round(num: int, scale: int):
+    half = scale/2
+    div = num // scale
+    if num % scale >= half:
+        return (div + 1) * scale
+    else:
+        return div*scale
+
+
+
 

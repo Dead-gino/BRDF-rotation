@@ -77,6 +77,8 @@ if __name__ == '__main__':
     # revolve sub-curves
     px_1 = rev.revolve_all(ps_1, 100)
     px_2 = rev.revolve_all(ps_2, 100)
+    px = px_1 + px_2
+    points.rasterize(px, 5)
 
     # turn solid of revolution into plotable data
     # abc = points.convert_points(px)
