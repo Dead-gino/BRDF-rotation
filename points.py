@@ -11,6 +11,41 @@ class Point:
     def __str__(self):
         return f"({self.x}, {self.y}, {self.z})"
 
+    def __lt__(self, other):
+        if self.x == other.x & self.y == other.y:
+            return self.z < other.z
+        elif self.x == other.x:
+            return self.y < other.y
+        else:
+            return self.x < other.x
+
+    def __gt__(self, other):
+        if self.x == other.x & self.y == other.y:
+            return self.z > other.z
+        elif self.x == other.x:
+            return self.y > other.y
+        else:
+            return self.x > other.x
+
+    def __le__(self, other):
+        if self.x == other.x & self.y == other.y:
+            return self.z <= other.z
+        elif self.x == other.x:
+            return self.y <= other.y
+        else:
+            return self.x <= other.x
+
+    def __ge__(self, other):
+        if self.x == other.x & self.y == other.y:
+            return self.z >= other.z
+        elif self.x == other.x:
+            return self.y >= other.y
+        else:
+            return self.x >= other.x
+
+    def __eq__(self, other):
+        return self.x == other.x & self.y == other.y & self.z == other.z
+
     def dist2d(self, other):
         """ calculates the pythagorean distance between self and another point along the x and y axes
 
