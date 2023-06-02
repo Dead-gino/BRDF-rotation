@@ -45,7 +45,7 @@ def revolve(p, center, scale):
     :param scale: the amount of points created by the rotation
     :return: a list of points created by rotating p around center
     """
-    r = p.dist2D(center)
+    r = p.dist2d(center)
     ps = [p]
     for i in np.arange(0, 2*pi, (2*pi)/scale):
         x = center.x
@@ -70,3 +70,37 @@ def revolve_all(ps, scale):
     for p in ps:
         px += revolve(p, axis, scale)
     return px
+
+def remove_overlap_simple(ps: list):
+    """ removes overlapping datapoint that have equal x and y values and leaves only the highest number.
+        requires grid-aligned data
+
+    :param ps: the points to remove overlap from, all points aligned to the same grid
+    :return: the points left after removal
+    """
+    # sort all points
+    ps.sort()
+
+    x = -1
+    y = -1
+    prev = None
+    new_ps = []
+    for p in ps:
+        # if at a new point on grid, move tracker and reset z
+        if x != p.x:
+            x = p.x
+            if not(prev is None) and not(prev in new_ps):  # ensure there are no duplicate points
+                new_ps.append(prev)
+            prev = None
+        if y != p.y:
+            y = p.y
+            if not(prev is None) and not(prev in new_ps):  # no duplicates
+                new_ps.append(prev)
+            prev = None
+
+        if prev is None:
+            prev = p
+        elif prev.z < p.z:
+            prev = p
+
+    return new_ps

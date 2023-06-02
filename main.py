@@ -52,8 +52,8 @@ if __name__ == '__main__':
     # z = (np.cos((x/30))+1)/2
 
     # example data for two sub-curves
-    x_1 = np.arange(-90, 10, 10)
-    x_2 = np.arange(-90, 100, 10)
+    x_1 = np.arange(-90, 10, 5)
+    x_2 = np.arange(-90, 100, 5)
     y_1 = np.zeros(len(x_1))
     y_2 = np.zeros(len(x_2))
     z_1 = (-1 * ((x_1+45)**2))
@@ -75,14 +75,15 @@ if __name__ == '__main__':
     # create solid of revolution for all points around axis
     # px = rev.revolve_all(ps, 100)
     # revolve sub-curves
-    px_1 = rev.revolve_all(ps_1, 100)
-    px_2 = rev.revolve_all(ps_2, 100)
+    px_1 = rev.revolve_all(ps_1, 1000)
+    px_2 = rev.revolve_all(ps_2, 1000)
     px = px_1 + px_2
     points.rasterize(px, 5)
 
     # turn solid of revolution into plotable data
     # abc = points.convert_points(px)
-    abc = points.convert_points(px_1 + px_2)
+    px = rev.remove_overlap_simple(px)
+    abc = points.convert_points(px)
     a = abc[0]
     b = abc[1]
     c = abc[2]
@@ -98,11 +99,11 @@ if __name__ == '__main__':
     # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     # ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=mpl.cm.Blues)
 
-    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(-90, 90)
-    ax.set_zlim(0, 1)
-    ax.scatter(x, y, z)
+    # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    # ax.set_xlim(-90, 90)
+    # ax.set_ylim(-90, 90)
+    # ax.set_zlim(0, 1)
+    # ax.scatter(x, y, z)
 
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     ax.set_xlim(-90, 90)
