@@ -3,10 +3,8 @@
 import matplotlib as mpl
 import numpy
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import points
-import revolutions
 import revolutions as rev
 
 # Press Shift+F10 to execute it or replace it with your code.
@@ -81,7 +79,6 @@ if __name__ == '__main__':
     # y = [*y_1, *y_2, *y_3]
     # z = [*z_1, *z_2, *z_3]
 
-
     """
     create points for each point in data
     """
@@ -119,6 +116,25 @@ if __name__ == '__main__':
     b = abc[1]
     c = abc[2]
 
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    ax.set_xlim(-90, 90)
+    ax.set_ylim(-90, 90)
+    ax.set_zlim(0, 1)
+    ax.scatter(x, y, z)
+
+    # noinspection PyRedeclaration
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    ax.set_xlim(-90, 90)
+    ax.set_ylim(-90, 90)
+    ax.set_zlim(0, 1)
+    ax.scatter(a, b, c)
+
+    # show all plots
+    plt.show()
+
+    """
+    templates for creating plots
+    """
     # create scatter-plot from data, uses 3 arrays of numbers of equal length
     # transforms an array of arrays into a single array
     # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
@@ -129,18 +145,3 @@ if __name__ == '__main__':
     # noinspection PyRedeclaration
     # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     # ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=mpl.cm.Blues)
-
-    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(-90, 90)
-    ax.set_zlim(0, 1)
-    ax.scatter(x, y, z)
-
-    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(-90, 90)
-    ax.set_zlim(0, 1)
-    ax.scatter(a, b, c)
-
-    # show all plots
-    plt.show()
