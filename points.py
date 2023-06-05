@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 class Point:
     def __init__(self, x, y, z):
         self.x = x
@@ -10,6 +9,9 @@ class Point:
 
     def __str__(self):
         return f"({self.x}, {self.y}, {self.z})"
+
+    def __repr__(self):
+        return str(self)
 
     def __lt__(self, other):
         if self.x == other.x and self.y == other.y:

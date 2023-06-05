@@ -71,6 +71,21 @@ def revolve_all(ps, scale):
         px += revolve(p, axis, scale)
     return px
 
+
+def revolve_list(pss: list, scale):
+    """ creates a single solid of revolution from a list of sub-curves, represented by a list of lists of Points
+
+    :param pss: the list of curves to turn into a solid of revolution
+    :param scale: the amount of points in each band that from the solid
+    :return: a list of Points representing the solid of revolution
+    """
+    px = []
+    for ps in pss:
+        p = revolve_all(ps, scale)
+        px = px + p
+    return px
+
+
 def remove_overlap_simple(ps: list):
     """ removes overlapping datapoint that have equal x and y values and leaves only the highest number.
         requires grid-aligned data
@@ -104,3 +119,35 @@ def remove_overlap_simple(ps: list):
             prev = p
 
     return new_ps
+
+
+def sub_curves_naive(ps: list):
+    """ Finds all sub-curves in a naive way;
+        assumes data sorted on ascending x, then ascending z
+        cannot properly handle multiple points with the same x coordinate
+
+    :param ps: the points to find the sub-curves from
+    :return: a list containing lists of points, each list is one sub-curve
+    """
+    if len(ps) == 1:
+        return [ps]
+    elif len(ps) == 2:
+        return [ps]
+    else:
+        prev = ps[0]
+        curves = [[prev]]
+        asc = True
+        ci = 0
+        for i in np.arange(1, len(ps)):
+            cur = ps[i]
+            if prev.z > cur.z and asc:
+                asc = False
+            elif prev.z < cur.z and not asc:
+                asc = True
+                ci += 1
+
+            if ci == len(curves):
+                curves.append([])
+            curves[ci].append(cur)
+            prev = cur
+        return curves

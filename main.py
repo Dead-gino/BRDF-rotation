@@ -46,14 +46,14 @@ if __name__ == '__main__':
     """
     x,y,z data for all points on in-plane BRDF
     """
-    # example data
+    # example data, single curve
     # x = np.arange(-90, 95, 5)
     # y = np.zeros(len(x))
     # z = (np.cos((x/30))+1)/2
 
     # example data for two sub-curves
-    x_1 = np.arange(-90, 10, 5)
-    x_2 = np.arange(-90, 100, 5)
+    x_1 = np.arange(-90, -10, 5)
+    x_2 = np.arange(-10, 95, 5)
     y_1 = np.zeros(len(x_1))
     y_2 = np.zeros(len(x_2))
     z_1 = (-1 * ((x_1+45)**2))
@@ -64,24 +64,55 @@ if __name__ == '__main__':
     y = [*y_1, *y_2]
     z = [*z_1, *z_2]
 
+    # example data for three sub-curves
+    # x_1 = np.arange(-90, -30, 5)
+    # x_2 = np.arange(-30, 35, 5)
+    # x_3 = np.arange(35, 95, 5)
+    # y_1 = np.zeros(len(x_1))
+    # y_2 = np.zeros(len(x_2))
+    # y_3 = np.zeros(len(x_3))
+    # z_1 = (-1 * ((x_1+60)**2))
+    # z_1 = squash(z_1)
+    # z_2 = (-1 * (x_2**2))
+    # z_2 = squash(z_2)
+    # z_3 = (-1 * ((x_3-60)**2))
+    # z_3 = squash(z_3)
+    # x = [*x_1, *x_2, *x_3]
+    # y = [*y_1, *y_2, *y_3]
+    # z = [*z_1, *z_2, *z_3]
+
+
     """
     create points for each point in data
     """
+    # points for single curve
     # ps = points.create_points(x, y, z)
-    # points for sub-curves
+
+    # points for two sub-curves
     ps_1 = points.create_points(x_1, y_1, z_1)
     ps_2 = points.create_points(x_2, y_2, z_2)
+    p = ps_1 + ps_2
+    p.sort()
+    ps = rev.sub_curves_naive(p)
+
+    # points for three sub-curves
+    # ps_1 = points.create_points(x_1, y_1, z_1)
+    # print(len(x_2), len(y_2), len(z_2))
+    # ps_2 = points.create_points(x_2, y_2, z_2)
+    # ps_3 = points.create_points(x_3, y_3, z_3)
+    # p = ps_1 + ps_2 + ps_3
+    # p.sort()
+    # ps = rev.sub_curves_naive(p)
 
     # create solid of revolution for all points around axis
     # px = rev.revolve_all(ps, 100)
     # revolve sub-curves
-    px_1 = rev.revolve_all(ps_1, 1000)
-    px_2 = rev.revolve_all(ps_2, 1000)
-    px = px_1 + px_2
+    # px_1 = rev.revolve_all(ps_1, 1000)
+    # px_2 = rev.revolve_all(ps_2, 1000)
+    px = rev.revolve_list(ps, 1000)
     points.rasterize(px, 5)
 
     # turn solid of revolution into plotable data
-    # abc = points.convert_points(px)
     px = rev.remove_overlap_simple(px)
     abc = points.convert_points(px)
     a = abc[0]
@@ -99,11 +130,11 @@ if __name__ == '__main__':
     # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     # ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=mpl.cm.Blues)
 
-    # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    # ax.set_xlim(-90, 90)
-    # ax.set_ylim(-90, 90)
-    # ax.set_zlim(0, 1)
-    # ax.scatter(x, y, z)
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    ax.set_xlim(-90, 90)
+    ax.set_ylim(-90, 90)
+    ax.set_zlim(0, 1)
+    ax.scatter(x, y, z)
 
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     ax.set_xlim(-90, 90)
