@@ -46,7 +46,7 @@ def revolve(p, center, scale):
     :return: a list of points created by rotating p around center
     """
     r = p.dist2d(center)
-    ps = [p]
+    ps = []
     for i in np.arange(0, 2*pi, (2*pi)/scale):
         x = center.x
         y = center.y
@@ -84,6 +84,33 @@ def revolve_list(pss: list, scale):
         p = revolve_all(ps, scale)
         px = px + p
     return px
+
+
+def remove_overlap_angular(ps: list):
+    prev = None
+    px = [[]]
+    for p in ps:
+        if prev is None:
+            px[-1].append(p)
+            prev = p
+        else:
+            if prev.azimuth == p.azimuth and prev.altitude == p.altitude:
+                px[-1].append(p)
+                if prev.length < p.length:
+                    prev = p
+            else:
+                px.append([])
+                px[-1].append(p)
+                ps = []
+                # px.append(prev)
+                prev = p
+    # return px
+    pc = []
+    for ps in px:
+        ps.sort(reverse=True)
+        p = ps[0]
+        pc.append(p)
+    return pc
 
 
 def remove_overlap_simple(ps: list):

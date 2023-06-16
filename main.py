@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import points
 import revolutions as rev
+import math
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -15,6 +16,33 @@ def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
+
+def printer(ps: list):
+    for p in ps:
+        if isinstance(p, list):
+            print(p[0])
+        elif isinstance(p, points.Point):
+            print(p)
+
+
+def cp(ps: list):
+    pc = []
+    for p in ps:
+        pc.append(p)
+    return pc
+
+
+def coun(ps: list):
+    x = 0
+    prev = None
+    for p in ps:
+        if prev is None:
+            prev = p
+            x += 1
+        elif prev != p:
+            prev = p
+            x += 1
+    return x
 
 def squash(nums):
     if isinstance(nums, numpy.ndarray):
@@ -45,27 +73,35 @@ if __name__ == '__main__':
     x,y,z data for all points on in-plane BRDF
     """
     # example data, single curve
-    # x = np.arange(-90, 95, 5)
-    # y = np.zeros(len(x))
-    # z = (np.cos((x/30))+1)/2
+    f = np.arange(0, 190, 10)
+    x = []
+    z = []
+    for p in f:
+        xf = math.cos(math.radians(p)) * 100
+        zf = math.sin(math.radians(p)) * 100
+        x.append(xf)
+        z.append(zf)
+    y = np.zeros(len(x))
+    # z = (np.cos((x/30))+1)*50
+    # z = np.sqrt((-1 * x**2)+10000)
 
     # example data for two sub-curves
-    x_1 = np.arange(-90, -10, 5)
-    x_2 = np.arange(-10, 95, 5)
-    y_1 = np.zeros(len(x_1))
-    y_2 = np.zeros(len(x_2))
-    z_1 = (-1 * ((x_1+45)**2))
-    z_1 = squash(z_1)
-    z_2 = (-1 * (x_2**2))
-    z_2 = squash(z_2)/2
-    x = [*x_1, *x_2]
-    y = [*y_1, *y_2]
-    z = [*z_1, *z_2]
+    # x_1 = np.arange(-100, -10, 10)
+    # x_2 = np.arange(-10, 110, 10)
+    # y_1 = np.zeros(len(x_1))
+    # y_2 = np.zeros(len(x_2))
+    # z_1 = (-1 * ((x_1+45)**2))
+    # z_1 = squash(z_1)*100
+    # z_2 = (-1 * (x_2**2))
+    # z_2 = squash(z_2)*50
+    # x = [*x_1, *x_2]
+    # y = [*y_1, *y_2]
+    # z = [*z_1, *z_2]
 
     # example data for three sub-curves
-    # x_1 = np.arange(-90, -30, 5)
-    # x_2 = np.arange(-30, 35, 5)
-    # x_3 = np.arange(35, 95, 5)
+    # x_1 = np.arange(-100, -50, 5) #14
+    # x_2 = np.arange(-50, 35, 5) #15
+    # x_3 = np.arange(35, 105, 5) #14
     # y_1 = np.zeros(len(x_1))
     # y_2 = np.zeros(len(x_2))
     # y_3 = np.zeros(len(x_3))
@@ -83,18 +119,17 @@ if __name__ == '__main__':
     create points for each point in data
     """
     # points for single curve
-    # ps = points.create_points(x, y, z)
+    ps = [points.create_points(x, y, z)]
 
     # points for two sub-curves
-    ps_1 = points.create_points(x_1, y_1, z_1)
-    ps_2 = points.create_points(x_2, y_2, z_2)
-    p = ps_1 + ps_2
-    p.sort()
-    ps = rev.sub_curves_naive(p)
+    # ps_1 = points.create_points(x_1, y_1, z_1)
+    # ps_2 = points.create_points(x_2, y_2, z_2)
+    # ps = [ps_1, ps_2]
+    # ps.sort()
+    # ps = rev.sub_curves_naive(p)
 
     # points for three sub-curves
     # ps_1 = points.create_points(x_1, y_1, z_1)
-    # print(len(x_2), len(y_2), len(z_2))
     # ps_2 = points.create_points(x_2, y_2, z_2)
     # ps_3 = points.create_points(x_3, y_3, z_3)
     # p = ps_1 + ps_2 + ps_3
@@ -106,28 +141,40 @@ if __name__ == '__main__':
     # revolve sub-curves
     # px_1 = rev.revolve_all(ps_1, 1000)
     # px_2 = rev.revolve_all(ps_2, 1000)
-    px = rev.revolve_list(ps, 1000)
-    points.rasterize(px, 5)
+    # px = px_1 + px_2
+    px = rev.revolve_list(ps, 72)
+    px.sort()
+
+    points.rasterize(px, 10)
+    px.sort()
+    # printer(px)
+
+    # px = rev.remove_overlap_angular(px)
+    # px = points.update_all(px)
+    # px.sort()
+    # printer(px)
+    print(len(px))
 
     # turn solid of revolution into plotable data
-    px = rev.remove_overlap_simple(px)
     abc = points.convert_points(px)
     a = abc[0]
     b = abc[1]
     c = abc[2]
 
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(-90, 90)
-    ax.set_zlim(0, 1)
+    ax.set_xlim(-100, 100)
+    ax.set_ylim(-100, 100)
+    ax.set_zlim(0, 100)
     ax.scatter(x, y, z)
-
-    # noinspection PyRedeclaration
+    #
+    # # noinspection PyRedeclaration
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    ax.set_xlim(-90, 90)
-    ax.set_ylim(-90, 90)
-    ax.set_zlim(0, 1)
+    ax.set_xlim(-100, 100)
+    ax.set_ylim(-100, 100)
+    ax.set_zlim(0, 100)
     ax.scatter(a, b, c)
+    #
+
 
     # show all plots
     plt.show()

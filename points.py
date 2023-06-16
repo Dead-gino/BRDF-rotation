@@ -1,52 +1,73 @@
 import numpy as np
+import math
 
 
 class Point:
+    """ a point in 3D space that stores its coordinates, its horizontal and vertical angles and its distance to 0
+
+    :var x: the x coordinate, domain: [0,100]
+    :var y: the y coordinate, domain: [0,100]
+    :var z: the z coordinate, domain: [0,100]
+    :var azimuth: the horizontal angle representing the rotation around the normal, lies across the x-y plane,
+                    domain: (-180,180]
+                    0 when on the x-axis and x is positive, 180 when on the x-axis and x is negative
+                    90 when on the y-axis and y is positive, -90 when on the y-axis and y is negative
+                    positive when y is positive, negative when y is negative
+    :var altitude: the vertical angle representing the angle to the normal, lies across the x-z plane,
+                    domain: [0,90]
+                    0 when on the z-axis, 90 when on the x-axis
+    :var length: the length of the vector from 0 to self
+                    represents the intensity of the light reflected in the direction of the vector in percentages
+                    domain: [0,100]
+    """
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
+        self.azimuth = self.angle_horizontal()
+        self.altitude = self.angle_vertical()
+        self.length = self.length()
 
     def __str__(self):
-        return f"({self.x}, {self.y}, {self.z})"
+        return f"({self.azimuth}, {self.altitude}, {self.length})"
 
     def __repr__(self):
         return str(self)
 
     def __lt__(self, other):
-        if self.x == other.x and self.y == other.y:
-            return self.z < other.z
-        elif self.x == other.x:
-            return self.y < other.y
+        if self.altitude != other.altitude:
+            return self.altitude < other.altitude
+        elif self.azimuth != other.azimuth:
+            return self.azimuth < other.azimuth
         else:
-            return self.x < other.x
+            return self.length < other.length
 
     def __gt__(self, other):
-        if self.x == other.x and self.y == other.y:
-            return self.z > other.z
-        elif self.x == other.x:
-            return self.y > other.y
+        if self.altitude != other.altitude:
+            return self.altitude > other.altitude
+        elif self.azimuth != other.azimuth:
+            return self.azimuth > other.azimuth
         else:
-            return self.x > other.x
+            return self.length > other.length
 
     def __le__(self, other):
-        if self.x == other.x and self.y == other.y:
-            return self.z <= other.z
-        elif self.x == other.x:
-            return self.y <= other.y
+        if self.altitude != other.altitude:
+            return self.altitude <= other.altitude
+        elif self.azimuth != other.azimuth:
+            return self.azimuth <= other.azimuth
         else:
-            return self.x <= other.x
+            return self.length <= other.length
 
     def __ge__(self, other):
-        if self.x == other.x and self.y == other.y:
-            return self.z >= other.z
-        elif self.x == other.x:
-            return self.y >= other.y
+        if self.altitude != other.altitude:
+            return self.altitude >= other.altitude
+        elif self.azimuth != other.azimuth:
+            return self.azimuth >= other.azimuth
         else:
-            return self.x >= other.x
+            return self.length >= other.length
 
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y and self.z == other.z
+        return self.altitude == other.altitude and self.azimuth == other.azimuth and self.length == other.length
 
     def dist2d(self, other):
         """ calculates the pythagorean distance between self and another point along the x and y axes
@@ -68,6 +89,54 @@ class Point:
         dy = np.abs(self.y - other.y)
         dz = np.abs(self.z - other.z)
         return np.sqrt(dx**2 + dy**2 + dz**2)
+
+    def angle_horizontal(self):
+        x = self.x
+        y = self.y
+        if x == 0 and y > 0:
+            return 90.0
+        elif x == 0 and y < 0:
+            return -90.0
+        elif y == 0 and x < 0:
+            return 180
+        elif x > 0:
+            return math.degrees(math.atan(y / x))
+        elif x < 0 < y:
+            return math.degrees(math.atan(y / x)) + 180
+        elif x < 0 and y < 0:
+            return math.degrees(math.atan(y / x)) - 180
+        else:
+            return 0.0
+
+    def angle_vertical(self):
+        x = self.x
+        z = self.z
+        if x == 0:
+            return 90.0
+        else:
+            return abs(math.degrees(math.atan(z / x)))
+
+    def length(self):
+        """ calculate the length of the vector between the point and (0,0,0)
+
+        :return: the distance between self and (0,0,0)
+        """
+        return np.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+
+    def update_coordinates(self):
+        """ updates coordinates based on angles
+
+        :return: nothing, point itself is altered
+        """
+        azi = self.azimuth
+        alti = self.altitude
+        length = self.length
+        x = length * (math.sin(math.radians(azi)) * math.cos(math.radians(alti)))
+        y = length * (math.cos(math.radians(azi)) * math.cos(math.radians(alti)))
+        z = length * (math.sin(math.radians(alti)))
+        self.x = x
+        self.y = y
+        self.z = z
 
 
 def zero():
@@ -133,12 +202,41 @@ def rasterize(ps: list, step: int):
     :return: 
     """
     for p in ps:
-        x = p.x
-        y = p.y
-        new_x = __round_to_scale(x, step)
-        new_y = __round_to_scale(y, step)
-        p.x = new_x
-        p.y = new_y
+        # phi_h = p.phi_h
+        # phi_v = p.phi_v
+        # new_v = __round_to_scale(phi_v, step)
+        # if new_v == 90:
+        #     new_h = 0
+        # else:
+        #     new_h = __round_to_scale(phi_h, step)
+        #
+        # if new_h == -180:
+        #     new_h = 180
+        # # print(f"from {p.phi_h} to {new_h}, and from {p.phi_v} to {new_v}")
+        # p.phi_h = new_h
+        # p.phi_v = new_v
+        if p.azimuth % step != 0:
+            p.azimuth = __round_to_scale(p.azimuth, step)
+        else:
+            p.azimuth = round(p.azimuth)
+        if p.altitude % step != 0:
+            p.altitude = __round_to_scale(p.altitude, step)
+        else:
+            p.altitude = round(p.altitude)
+
+        if p.altitude == 90:  # points straight up, so azimuth does not matter; set azimuth to 0 for uniformity
+            p.azimuth = 0
+
+        if p.azimuth == -180:  # azimuth -180 is equal to azimuth 180, both are 180 degrees away from azimuth 0
+            p.azimuth = 180
+
+        p.update_coordinates()
+
+
+def update_all(ps: list):
+    for p in ps:
+        p.update_coordinates()
+    return ps
 
 
 def __round_to_scale(num: float, scale: int):
@@ -148,13 +246,20 @@ def __round_to_scale(num: float, scale: int):
     :param scale: the scale to round to
     :return: the number rounded to the given scale
     """
-    half = scale/2
-    div = num // scale
-    if num % scale >= half:
-        return (div + 1) * scale
-    else:
-        return div*scale
+    # half = scale/2
+    # div = num // scale
+    # if num % scale >= half:
+    #     return (div + 1) * scale
+    # else:
+    #     return div*scale
+    return scale * round(round(num)/scale)
 
 
-
+def test_data():
+    x = np.arange(-100,105,5)
+    y = np.zeros(len(x))
+    z = (((-1 * (x**2))/100)+100)
+    p = create_points(x, y, z)
+    p.sort()
+    return p
 
