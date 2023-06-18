@@ -24,12 +24,15 @@ class Point:
         self.x = x
         self.y = y
         self.z = z
-        self.azimuth = self.angle_horizontal()
+        self.length = self.intensity()
         self.altitude = self.angle_vertical()
-        self.length = self.length()
+        self.azimuth = self.angle_horizontal()
+
 
     def __str__(self):
-        return f"({self.azimuth}, {self.altitude}, {self.length})"
+        # return f"(x: {self.x}, y: {self.y}, z: {self.z}, " \
+        #        f"azimuth: {self.azimuth}, altitude: {self.altitude}, intensity: {self.length})"
+        return f"(azimuth: {self.azimuth}, altitude: {self.altitude}"
 
     def __repr__(self):
         return str(self)
@@ -91,32 +94,20 @@ class Point:
         return np.sqrt(dx**2 + dy**2 + dz**2)
 
     def angle_horizontal(self):
+        if self.altitude == 90:
+            return 0
         x = self.x
         y = self.y
-        if x == 0 and y > 0:
-            return 90.0
-        elif x == 0 and y < 0:
-            return -90.0
-        elif y == 0 and x < 0:
-            return 180
-        elif x > 0:
-            return math.degrees(math.atan(y / x))
-        elif x < 0 < y:
-            return math.degrees(math.atan(y / x)) + 180
-        elif x < 0 and y < 0:
-            return math.degrees(math.atan(y / x)) - 180
-        else:
-            return 0.0
+        theta = math.degrees(math.atan2(y, x))
+        return theta
 
     def angle_vertical(self):
-        x = self.x
+        l = self.intensity()
         z = self.z
-        if x == 0:
-            return 90.0
-        else:
-            return abs(math.degrees(math.atan(z / x)))
+        phi = math.degrees(math.asin(z/l))
+        return phi
 
-    def length(self):
+    def intensity(self):
         """ calculate the length of the vector between the point and (0,0,0)
 
         :return: the distance between self and (0,0,0)
@@ -131,12 +122,36 @@ class Point:
         azi = self.azimuth
         alti = self.altitude
         length = self.length
-        x = length * (math.sin(math.radians(azi)) * math.cos(math.radians(alti)))
-        y = length * (math.cos(math.radians(azi)) * math.cos(math.radians(alti)))
+        y = length * (math.sin(math.radians(azi)) * math.cos(math.radians(alti)))
+        x = length * (math.cos(math.radians(azi)) * math.cos(math.radians(alti)))
         z = length * (math.sin(math.radians(alti)))
         self.x = x
         self.y = y
         self.z = z
+
+    def update_angles(self):
+        self.azimuth = self.angle_horizontal()
+        self.altitude = self.angle_vertical()
+        self.length = self.intensity()
+
+    def round_angles(self, scale):
+        azimuth = self.azimuth
+        altitude = self.altitude
+        half = scale/2
+        d_azimuth = azimuth % scale
+        d_altitude = altitude % scale
+        self.azimuth -= d_azimuth
+        self.altitude -= d_altitude
+        if d_azimuth > half:
+            self.azimuth += scale
+        if d_altitude > half:
+            self.altitude += scale
+
+    def shift(self, dx, dy, dz):
+        self.x += dx
+        self.y += dy
+        self.z += dz
+        self.update_angles()
 
 
 def zero():
@@ -155,6 +170,13 @@ def create_point(x, y, z):
     :param z: the z coordinate of the point
     :return: A point with corresponding coordinates
     """
+    return Point(x, y, z)
+
+
+def from_angles(azimuth, altitude, length):
+    x = length * (math.cos(math.radians(azimuth)) * math.cos(math.radians(altitude)))
+    y = length * (math.sin(math.radians(azimuth)) * math.cos(math.radians(altitude)))
+    z = length * (math.sin(math.radians(altitude)))
     return Point(x, y, z)
 
 
@@ -215,22 +237,25 @@ def rasterize(ps: list, step: int):
         # # print(f"from {p.phi_h} to {new_h}, and from {p.phi_v} to {new_v}")
         # p.phi_h = new_h
         # p.phi_v = new_v
-        if p.azimuth % step != 0:
-            p.azimuth = __round_to_scale(p.azimuth, step)
-        else:
-            p.azimuth = round(p.azimuth)
-        if p.altitude % step != 0:
-            p.altitude = __round_to_scale(p.altitude, step)
-        else:
-            p.altitude = round(p.altitude)
-
-        if p.altitude == 90:  # points straight up, so azimuth does not matter; set azimuth to 0 for uniformity
-            p.azimuth = 0
-
-        if p.azimuth == -180:  # azimuth -180 is equal to azimuth 180, both are 180 degrees away from azimuth 0
-            p.azimuth = 180
-
-        p.update_coordinates()
+        #
+        # if p.azimuth % step != 0:
+        #     p.azimuth = __round_to_scale(p.azimuth, step)
+        # else:
+        #     p.azimuth = round(p.azimuth)
+        # if p.altitude % step != 0:
+        #     p.altitude = __round_to_scale(p.altitude, step)
+        # else:
+        #     p.altitude = round(p.altitude)
+        #
+        # if p.altitude == 90:  # points straight up, so azimuth does not matter; set azimuth to 0 for uniformity
+        #     p.azimuth = 0
+        #
+        # if p.azimuth == -180:  # azimuth -180 is equal to azimuth 180, both are 180 degrees away from azimuth 0
+        #     p.azimuth = 180
+        #
+        # p.update_coordinates()
+        p.round_angles(step)
+        True
 
 
 def update_all(ps: list):

@@ -45,15 +45,15 @@ def revolve(p, center, scale):
     :param scale: the amount of points created by the rotation
     :return: a list of points created by rotating p around center
     """
-    r = p.dist2d(center)
+    offset = center.x
+    base = points.create_point(p.x - center.x, p.y, p.z)
+    azimuth = base.azimuth
+    altitude = base.altitude
+    length = base.length
     ps = []
-    for i in np.arange(0, 2*pi, (2*pi)/scale):
-        x = center.x
-        y = center.y
-        theta = i
-        a = x + (math.cos(theta) * r)
-        b = y + (math.sin(theta) * r)
-        new_p = Point(a, b, p.z)
+    for i in np.arange(0, 360, 360 / scale):
+        round(i)
+        new_p = points.from_angles(azimuth + i, altitude, length)
         ps.append(new_p)
     return ps
 
@@ -87,30 +87,15 @@ def revolve_list(pss: list, scale):
 
 
 def remove_overlap_angular(ps: list):
-    prev = None
-    px = [[]]
+    px = []
     for p in ps:
-        if prev is None:
-            px[-1].append(p)
-            prev = p
-        else:
-            if prev.azimuth == p.azimuth and prev.altitude == p.altitude:
-                px[-1].append(p)
-                if prev.length < p.length:
-                    prev = p
-            else:
-                px.append([])
-                px[-1].append(p)
-                ps = []
-                # px.append(prev)
-                prev = p
-    # return px
-    pc = []
-    for ps in px:
-        ps.sort(reverse=True)
-        p = ps[0]
-        pc.append(p)
-    return pc
+        if len(px) == 0:
+            px.append(p)
+        elif not(px[-1].azimuth == p.azimuth and px[-1].altitude == p.altitude):
+            px.append(p)
+        # else:
+        #     px.append(p)
+    return px
 
 
 def remove_overlap_simple(ps: list):
