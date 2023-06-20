@@ -28,7 +28,6 @@ class Point:
         self.altitude = self.angle_vertical()
         self.azimuth = self.angle_horizontal()
 
-
     def __str__(self):
         # return f"(x: {self.x}, y: {self.y}, z: {self.z}, " \
         #        f"azimuth: {self.azimuth}, altitude: {self.altitude}, intensity: {self.length})"
@@ -94,6 +93,10 @@ class Point:
         return np.sqrt(dx**2 + dy**2 + dz**2)
 
     def angle_horizontal(self):
+        """ calculates the azimuth of a Point
+
+        :return: the azimuth of self
+        """
         if self.altitude == 90:
             return 0
         x = self.x
@@ -102,6 +105,10 @@ class Point:
         return theta
 
     def angle_vertical(self):
+        """ calculates the altitude of a Point
+
+        :return: the altitude of self
+        """
         l = self.intensity()
         z = self.z
         phi = math.degrees(math.asin(z/l))
@@ -130,11 +137,20 @@ class Point:
         self.z = z
 
     def update_angles(self):
+        """ recalculates the angles of a Point
+
+        :return: nothing, updates an existing instance of Point
+        """
         self.azimuth = self.angle_horizontal()
         self.altitude = self.angle_vertical()
         self.length = self.intensity()
 
     def round_angles(self, scale):
+        """ rounds all angles to a certain scale
+
+        :param scale: the scale to round the angles to
+        :return: nothing, updates an existing instance of Point
+        """
         azimuth = self.azimuth
         altitude = self.altitude
         half = scale/2
@@ -148,6 +164,13 @@ class Point:
             self.altitude += scale
 
     def shift(self, dx, dy, dz):
+        """ shifts a point in a direction
+
+        :param dx: the distance to move along the x-axis
+        :param dy: the distance to move along the y-axis
+        :param dz: the distance to move along the z-axis
+        :return: nothing, this method changes an existing instance of a Point
+        """
         self.x += dx
         self.y += dy
         self.z += dz
@@ -174,6 +197,13 @@ def create_point(x, y, z):
 
 
 def from_angles(azimuth, altitude, length):
+    """ constructor for a point using the angles and intensity instead of coordinates
+
+    :param azimuth: the azimuth angle of the vector corresponding to the point
+    :param altitude: the altitude angle of the vector corresponding to the point
+    :param length: the length of the vector corresponding to the point, i.e. the distance from the point to 0
+    :return: a Point with coordinates corresponding to the given angles and intensity
+    """
     x = length * (math.cos(math.radians(azimuth)) * math.cos(math.radians(altitude)))
     y = length * (math.sin(math.radians(azimuth)) * math.cos(math.radians(altitude)))
     z = length * (math.sin(math.radians(altitude)))
@@ -217,16 +247,18 @@ def convert_points(ps: list):
 
 
 def rasterize(ps: list, step: int):
-    """ Aligns a list of points to a grid of a given step scale
+    """ Aligns a list of vectors to a grid of angles with a given scale
+        i.e. rounds both the azimuth and altitude angles to a certain scale
 
-    :param ps: the list of points to align to grid
-    :param step: the step scale of the grid, e.g. sample 5 aligns to a grid with distance 5 between each point
+    :param ps: the list of vectors to align
+    :param step: the step scale of the grid, e.g. sample 5 aligns to a grid with distance 5 between each angle
     :return: 
     """
     for p in ps:
         # phi_h = p.phi_h
         # phi_v = p.phi_v
         # new_v = __round_to_scale(phi_v, step)
+
         # if new_v == 90:
         #     new_h = 0
         # else:
@@ -249,16 +281,19 @@ def rasterize(ps: list, step: int):
         #
         # if p.altitude == 90:  # points straight up, so azimuth does not matter; set azimuth to 0 for uniformity
         #     p.azimuth = 0
-        #
         # if p.azimuth == -180:  # azimuth -180 is equal to azimuth 180, both are 180 degrees away from azimuth 0
         #     p.azimuth = 180
-        #
         # p.update_coordinates()
         p.round_angles(step)
         True
 
 
 def update_all(ps: list):
+    """ updates the coordinates of a list of points
+
+    :param ps: the points to update
+    :return: a list with the updated points, which is the same list as the input
+    """
     for p in ps:
         p.update_coordinates()
     return ps
@@ -278,13 +313,3 @@ def __round_to_scale(num: float, scale: int):
     # else:
     #     return div*scale
     return scale * round(round(num)/scale)
-
-
-def test_data():
-    x = np.arange(-100,105,5)
-    y = np.zeros(len(x))
-    z = (((-1 * (x**2))/100)+100)
-    p = create_points(x, y, z)
-    p.sort()
-    return p
-

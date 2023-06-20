@@ -20,7 +20,7 @@ def print_hi(name):
 def printer(ps: list):
     for p in ps:
         if isinstance(p, list):
-            print(p[0])
+            printer(p)
         elif isinstance(p, points.Point):
             print(p)
 
@@ -44,6 +44,7 @@ def coun(ps: list):
             x += 1
     return x
 
+
 def squash(nums):
     if isinstance(nums, numpy.ndarray):
         min_n = abs(min(nums))
@@ -65,38 +66,49 @@ if __name__ == '__main__':
     """
     -------------------------------------------------------------------------------------
     main bulk of code
-    currently creates and plots a solid of revolution of simple curve around center axis
     -------------------------------------------------------------------------------------
     """
 
     """
-    x,y,z data for all points on in-plane BRDF
+    
+    all points that represent the in-plane BRDF
+    
     """
     # example data, single curve
-    f = np.arange(0, 190, 10)
-    x = []
-    z = []
-    for p in f:
-        xf = math.cos(math.radians(p)) * 100
-        zf = math.sin(math.radians(p)) * 100
-        x.append(xf)
-        z.append(zf)
-    y = np.zeros(len(x))
-    # z = (np.cos((x/30))+1)*50
-    # z = np.sqrt((-1 * x**2)+10000)
+    # f = np.arange(0, 190, 10)
+    # x = []
+    # z = []
+    # for p in f:
+    #     xf = math.cos(math.radians(p)) * 100
+    #     zf = math.sin(math.radians(p)) * 100
+    #     x.append(xf)
+    #     z.append(zf)
+    # y = np.zeros(len(x))
 
     # example data for two sub-curves
-    # x_1 = np.arange(-100, -10, 10)
-    # x_2 = np.arange(-10, 110, 10)
-    # y_1 = np.zeros(len(x_1))
-    # y_2 = np.zeros(len(x_2))
-    # z_1 = (-1 * ((x_1+45)**2))
-    # z_1 = squash(z_1)*100
-    # z_2 = (-1 * (x_2**2))
-    # z_2 = squash(z_2)*50
-    # x = [*x_1, *x_2]
-    # y = [*y_1, *y_2]
-    # z = [*z_1, *z_2]
+    f_1 = np.arange(0, 100, 10)
+    x_1 = []
+    z_1 = []
+    for p in f_1:
+        xf = math.cos(math.radians(p)) * (p + 10)
+        zf = math.sin(math.radians(p)) * (p + 10)
+        x_1.append(xf)
+        z_1.append(zf)
+    y_1 = np.zeros(len(x_1))
+
+    f_2 = np.arange(100, 190, 10)
+    x_2 = []
+    z_2 = []
+    for p in f_2:
+        xf = math.cos(math.radians(p)) * (180-p)
+        zf = math.sin(math.radians(p)) * (180-p)
+        x_2.append(xf)
+        z_2.append(zf)
+    y_2 = np.zeros(len(x_2))
+
+    x = np.concatenate([x_1, x_2])
+    y = np.concatenate([y_1, y_2])
+    z = np.concatenate([z_1, z_2])
 
     # example data for three sub-curves
     # x_1 = np.arange(-100, -50, 5) #14
@@ -116,17 +128,19 @@ if __name__ == '__main__':
     # z = [*z_1, *z_2, *z_3]
 
     """
+    
     create points for each point in data
+    
     """
     # points for single curve
-    ps = [points.create_points(x, y, z)]
+    # ps = [points.create_points(x, y, z)]
 
     # points for two sub-curves
-    # ps_1 = points.create_points(x_1, y_1, z_1)
-    # ps_2 = points.create_points(x_2, y_2, z_2)
-    # ps = [ps_1, ps_2]
-    # ps.sort()
-    # ps = rev.sub_curves_naive(p)
+    ps_1 = points.create_points(x_1, y_1, z_1)
+    ps_2 = points.create_points(x_2, y_2, z_2)
+    ps = numpy.concatenate([ps_1, ps_2])
+    ps.sort()
+    ps = rev.sub_curves_naive(ps)
 
     # points for three sub-curves
     # ps_1 = points.create_points(x_1, y_1, z_1)
@@ -136,24 +150,40 @@ if __name__ == '__main__':
     # p.sort()
     # ps = rev.sub_curves_naive(p)
 
-    # create solid of revolution for all points around axis
+    """
+    
+    create solid of revolution for all sub-curves
+    
+    """
     # px = rev.revolve_all(ps, 100)
     # revolve sub-curves
     # px_1 = rev.revolve_all(ps_1, 1000)
     # px_2 = rev.revolve_all(ps_2, 1000)
     # px = px_1 + px_2
+
     px = rev.revolve_list(ps, 72)
     px.sort()
 
+    """
+    
+    remove excess data
+    
+    the scale used in rasterize should be at least 360 divided by the scale of the revolution
+    a smaller scale will lead to gaps in the data
+    
+    """
     points.rasterize(px, 10)
+    px = points.update_all(px)
     px.sort()
-    # printer(px)
 
-    # px = rev.remove_overlap_angular(px)
+    px = rev.remove_overlap_angular(px)
     # px = points.update_all(px)
-    # px.sort()
-    # printer(px)
-    print(len(px))
+
+    """
+    
+    plot the data
+    
+    """
 
     # turn solid of revolution into plotable data
     abc = points.convert_points(px)
@@ -166,29 +196,26 @@ if __name__ == '__main__':
     ax.set_ylim(-100, 100)
     ax.set_zlim(0, 100)
     ax.scatter(x, y, z)
-    #
-    # # noinspection PyRedeclaration
+
+    # noinspection PyRedeclaration
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
     ax.set_xlim(-100, 100)
     ax.set_ylim(-100, 100)
     ax.set_zlim(0, 100)
     ax.scatter(a, b, c)
-    #
-
 
     # show all plots
     plt.show()
 
     """
     templates for creating plots
-    """
-    # create scatter-plot from data, uses 3 arrays of numbers of equal length
-    # transforms an array of arrays into a single array
-    # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    # # ax.scatter(xs, ys, zs)
-    # ax.scatter(X, Y, Z)
 
-    # create surface plot from data, uses 3 2-dimensional arrays of numbers of equal sizes
-    # noinspection PyRedeclaration
-    # fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    # ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=mpl.cm.Blues)
+    create scatter-plot from data, uses 3 arrays of numbers of equal length:
+    transforms an array of arrays into a single array
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+        ax.scatter(xs, ys, zs)
+
+    create surface plot from data, uses 3 2-dimensional arrays of numbers of equal sizes
+        fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+        ax.plot_surface(X, Y, Z, vmin=Z.min() * 2, cmap=mpl.cm.Blues)
+    """

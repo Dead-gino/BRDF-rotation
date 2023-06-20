@@ -37,7 +37,7 @@ def find_axis_vertical(ps: list):
     return Point(x, 0, 0)
 
 
-def revolve(p, center, scale):
+def revolve_simple(p, center, scale):
     """ creates a circle of points by rotating a given point around an axis
 
     :param p: the original point that is rotated
@@ -68,7 +68,7 @@ def revolve_all(ps, scale):
     axis = find_axis_vertical(ps)
     px = []
     for p in ps:
-        px += revolve(p, axis, scale)
+        px += revolve_simple(p, axis, scale)
     return px
 
 
@@ -87,14 +87,19 @@ def revolve_list(pss: list, scale):
 
 
 def remove_overlap_angular(ps: list):
+    """ removes overlapping vectors that point in the same direction, leaving the vector with the highest intensity
+
+    :param ps: a list with the points to remove overlapping vectors from
+    :return: a new list with the remaining points
+    """
     px = []
     for p in ps:
         if len(px) == 0:
-            px.append(p)
+            px.append(p)  # if px is empty: add the first point to px
         elif not(px[-1].azimuth == p.azimuth and px[-1].altitude == p.altitude):
-            px.append(p)
-        # else:
-        #     px.append(p)
+            px.append(p)  # if the last point in px is not parallel to p: add p to the end of px
+        elif px[-1].azimuth == p.azimuth and px[-1].altitude == p.altitude and px[-1].length < p.length:
+            px[-1] = p  # if the last point in px is parallel to p and p is longer: replace the last point in px with p
     return px
 
 
