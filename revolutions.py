@@ -38,7 +38,7 @@ def find_axis_vertical(ps: list):
 
 
 def revolve_simple(p, center, scale):
-    """ creates a circle of points by rotating a given point around an axis
+    """ creates a circle of points by rotating a given point around a vertical axis that goes through center
 
     :param p: the original point that is rotated
     :param center: the axis to rotate around
@@ -46,7 +46,7 @@ def revolve_simple(p, center, scale):
     :return: a list of points created by rotating p around center
     """
     offset = center.x
-    base = points.create_point(p.x - center.x, p.y, p.z)
+    base = points.create_point(p.x - offset, p.y, p.z)
     azimuth = base.azimuth
     altitude = base.altitude
     length = base.length
@@ -58,7 +58,34 @@ def revolve_simple(p, center, scale):
     return ps
 
 
-def revolve_all(ps, scale):
+def revolve_axis(p, axis, offset, scale):
+    """ creates a band of points by revolving p around an axis, with the axis offset from going through 0 by the offset
+
+    :param p: the point to revolve
+    :param axis: the axis to revolve around
+    :param offset: the offset of the axis from 0 along the x-axis
+    :param scale: the amount of points on the created band of points
+    :return: a list containing all the points on the band
+    """
+    off_p = points.create_point(p.x, p.y, p.z)
+    off_p.shift(-offset, 0, 0)
+    ps = []
+    cross = axis.cross(off_p)
+    dot = axis.dot(off_p)
+    print(f"{cross}, {dot}")
+    for theta in np.arange(0, 360, 360/scale):
+        cos = math.cos(math.radians(theta))
+        sin = math.sin(math.radians(theta))
+        x = (off_p.x * cos) + (cross.x * sin) + (axis.x * (dot * (1 - cos)))
+        y = (off_p.y * cos) + (cross.y * sin) + (axis.y * (dot * (1 - cos)))
+        z = (off_p.z * cos) + (cross.z * sin) + (axis.z * (dot * (1 - cos)))
+        x += offset
+        new_p = points.create_point(x, y, z)
+        ps.append(new_p)
+    return ps
+
+
+def revolve_all_simple(ps, scale):
     """ creates a solid of revolution from a list of points
 
     :param ps: the points to turn into a solid of revolution
@@ -72,6 +99,21 @@ def revolve_all(ps, scale):
     return px
 
 
+def revolve_all_axis(ps, axis, offset, scale):
+    """ creates a solid of revolution by rotating a list of points around an axis
+
+    :param ps: the list of points to turn into a solid of revolution
+    :param axis: a vector describing the direction of the axis of revolution
+    :param offset: the x-offset of the axis
+    :param scale: the amount of points in each band that forms the solid
+    :return: a list of Points representing the solid of revolution
+    """
+    px = []
+    for p in ps:
+        px.extend(revolve_axis(p, axis, offset, scale))
+    return px
+
+
 def revolve_list(pss: list, scale):
     """ creates a single solid of revolution from a list of sub-curves, represented by a list of lists of Points
 
@@ -81,7 +123,7 @@ def revolve_list(pss: list, scale):
     """
     px = []
     for ps in pss:
-        p = revolve_all(ps, scale)
+        p = revolve_all_simple(ps, scale)
         px = px + p
     return px
 

@@ -29,9 +29,9 @@ class Point:
         self.azimuth = self.angle_horizontal()
 
     def __str__(self):
-        # return f"(x: {self.x}, y: {self.y}, z: {self.z}, " \
-        #        f"azimuth: {self.azimuth}, altitude: {self.altitude}, intensity: {self.length})"
-        return f"(azimuth: {self.azimuth}, altitude: {self.altitude}"
+        return f"(x: {self.x}, y: {self.y}, z: {self.z}, " \
+               f"azimuth: {self.azimuth}, altitude: {self.altitude}, intensity: {self.length})"
+        # return f"(azimuth: {self.azimuth}, altitude: {self.altitude}"
 
     def __repr__(self):
         return str(self)
@@ -176,6 +176,55 @@ class Point:
         self.z += dz
         self.update_angles()
 
+    def cross(self, other):
+        """ the cross product between self and other
+
+        :param other: the second argument of the cross product
+        :return: the cross product of self and other
+        """
+        a_1 = self.x
+        a_2 = self.y
+        a_3 = self.z
+        b_1 = other.x
+        b_2 = other.y
+        b_3 = other.z
+        x = a_2 * b_3 - a_3 * b_2
+        y = a_3 * b_1 - a_1 * b_3
+        z = a_1 * b_2 - a_2 * b_1
+        prod = create_point(x, y, z)
+        return prod
+
+    def dot(self, other):
+        """ the dot product between self and other
+
+        :param other: the second argument of the cross product
+        :return: the dot product of self and other
+        """
+        a_1 = self.x
+        a_2 = self.y
+        a_3 = self.z
+        b_1 = other.x
+        b_2 = other.y
+        b_3 = other.z
+        dot = (a_1 * b_1) + (a_2 * b_2) + (a_3 * b_3)
+        return dot
+
+    def mult(self, magnitude):
+        """ multiplies the vector with the magnitude
+
+        :param magnitude: the number to multiply the vector by
+        :return: nothing, alters an existing instance of Point
+        """
+        x = self.x * magnitude
+        y = self.y * magnitude
+        z = self.z * magnitude
+        l = self.length * magnitude
+        self.x = x
+        self.y = y
+        self.z = z
+        self.length = l
+
+
 
 def zero():
     """ Creates a point with all coordinates set to 0
@@ -243,7 +292,7 @@ def convert_points(ps: list):
         xs.append(p.x)
         ys.append(p.y)
         zs.append(p.z)
-    return [xs, ys, zs]
+    return xs, ys, zs
 
 
 def rasterize(ps: list, step: int):
