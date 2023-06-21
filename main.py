@@ -74,61 +74,49 @@ if __name__ == '__main__':
     all points that represent the in-plane BRDF
     
     """
-    # example data, single curve
+    # example data, diffuse
     # f = np.arange(0, 190, 10)
     # x = []
     # z = []
     # for p in f:
-    #     xf = math.cos(math.radians(p)) * 100
-    #     zf = math.sin(math.radians(p)) * 100
+    #     xf = math.cos(math.radians(p)) * 50
+    #     zf = math.sin(math.radians(p)) * 50
     #     x.append(xf)
     #     z.append(zf)
     # y = np.zeros(len(x))
 
-    # example data for two sub-curves
-    f_1 = np.arange(0, 110, 10)
-    f_2 = np.arange(170, 190, 10)
-    f = np.concatenate([f_1, f_2])
-    x_1 = []
-    z_1 = []
-    for p in f:
-        xf = math.cos(math.radians(p)) * 40
-        zf = math.sin(math.radians(p)) * 40
-        x_1.append(xf)
-        z_1.append(zf)
-    y_1 = np.zeros(len(x_1))
-
-    f_3 = np.arange(110, 170, 10)
-    x_2 = []
-    z_2 = []
-    for p in f_3:
-        s = 75 - abs(135 - p)
-        xf = math.cos(math.radians(p)) * s
-        zf = math.sin(math.radians(p)) * s
-        x_2.append(xf)
-        z_2.append(zf)
-    y_2 = np.zeros(len(x_2))
-
-    x = np.concatenate([x_1, x_2])
-    y = np.concatenate([y_1, y_2])
-    z = np.concatenate([z_1, z_2])
-
-    # example data for three sub-curves
-    # x_1 = np.arange(-100, -50, 5) #14
-    # x_2 = np.arange(-50, 35, 5) #15
-    # x_3 = np.arange(35, 105, 5) #14
+    # example data for two sub-curves, diffuse and specular
+    # f_1 = np.arange(0, 110, 10)
+    # f_2 = np.arange(170, 190, 10)
+    # f = np.concatenate([f_1, f_2])
+    # x_1 = []
+    # z_1 = []
+    # for p in f:
+    #     xf = math.cos(math.radians(p)) * 40
+    #     zf = math.sin(math.radians(p)) * 40
+    #     x_1.append(xf)
+    #     z_1.append(zf)
     # y_1 = np.zeros(len(x_1))
+    #
+    # f_3 = np.arange(110, 170, 10)
+    # x_2 = []
+    # z_2 = []
+    # for p in f_3:
+    #     s = 75 - abs(135 - p)
+    #     xf = math.cos(math.radians(p)) * s
+    #     zf = math.sin(math.radians(p)) * s
+    #     x_2.append(xf)
+    #     z_2.append(zf)
     # y_2 = np.zeros(len(x_2))
-    # y_3 = np.zeros(len(x_3))
-    # z_1 = (-1 * ((x_1+60)**2))
-    # z_1 = squash(z_1)
-    # z_2 = (-1 * (x_2**2))
-    # z_2 = squash(z_2)
-    # z_3 = (-1 * ((x_3-60)**2))
-    # z_3 = squash(z_3)
-    # x = [*x_1, *x_2, *x_3]
-    # y = [*y_1, *y_2, *y_3]
-    # z = [*z_1, *z_2, *z_3]
+    #
+    # x = np.concatenate([x_1, x_2])
+    # y = np.concatenate([y_1, y_2])
+    # z = np.concatenate([z_1, z_2])
+
+    # example data for one curve, specular
+    x = [1, 4.98, 9.8, 16.9, 23.5, 29.45, 34.8, 40.96, 46.2, 53.0, 38.4, 28.68, 20, 13.74, 8.5, 4.53, 1.7, 0.44, 0]
+    y = np.zeros(len(x))
+    z = [0, 0.44, 1.7, 4.53, 8.5, 13.74, 20, 28.68, 38.4, 53.0, 46.2, 40.96, 34.8, 29.45, 23.5, 16.9, 9.8, 4.98, 1]
 
     """
     
@@ -136,39 +124,32 @@ if __name__ == '__main__':
     
     """
     # points for single curve
-    # ps = [points.create_points(x, y, z)]
+    ps = points.create_points(x, y, z)
 
     # points for two sub-curves
-    ps_1 = points.create_points(x_1, y_1, z_1)
-    ps_2 = points.create_points(x_2, y_2, z_2)
+    # ps_1 = points.create_points(x_1, y_1, z_1)
+    # ps_2 = points.create_points(x_2, y_2, z_2)
     # ps = numpy.concatenate([ps_1, ps_2])
     # ps.sort()
     # ps = rev.sub_curves_naive(ps)
-
-    # points for three sub-curves
-    # ps_1 = points.create_points(x_1, y_1, z_1)
-    # ps_2 = points.create_points(x_2, y_2, z_2)
-    # ps_3 = points.create_points(x_3, y_3, z_3)
-    # p = ps_1 + ps_2 + ps_3
-    # p.sort()
-    # ps = rev.sub_curves_naive(p)
 
     """
     
     create solid of revolution for all sub-curves
     
     """
-    # px = rev.revolve_all(ps, 100)
+    axis = points.create_point(1/np.sqrt(2), 0, 1/np.sqrt(2))
+    px = rev.revolve_all_axis(ps, axis, 0, 72)
     # revolve sub-curves
     # px_1 = rev.revolve_all(ps_1, 1000)
     # px_2 = rev.revolve_all(ps_2, 1000)
     # px = px_1 + px_2
-    axis_1 = points.create_point(0, 0, 1)
-    axis_2 = points.create_point(-1/np.sqrt(2), 0, 1/np.sqrt(2))
-    px_1 = rev.revolve_all_axis(ps_1, axis_1, 0, 72)
-    px_2 = rev.revolve_all_axis(ps_2, axis_2, 0, 72)
-    px = px_1 + px_2
-    px.sort()
+    # axis_1 = points.create_point(0, 0, 1)
+    # axis_2 = points.create_point(-1/np.sqrt(2), 0, 1/np.sqrt(2))
+    # px_1 = rev.revolve_all_axis(ps_1, axis_1, 0, 72)
+    # px_2 = rev.revolve_all_axis(ps_2, axis_2, 0, 72)
+    # px = px_1 + px_2
+    # px.sort()
 
     """
     
@@ -178,12 +159,13 @@ if __name__ == '__main__':
     a smaller scale will lead to gaps in the data
     
     """
-    points.rasterize(px, 10)
+    points.rasterize(px, 5)
     px = points.update_all(px)
     px.sort()
-
+    #
     px = rev.remove_overlap_angular(px)
-    # px = points.update_all(px)
+    px = points.update_all(px)
+    printer(px)
 
     """
     

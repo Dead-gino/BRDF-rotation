@@ -71,7 +71,6 @@ def revolve_axis(p, axis, offset, scale):
     ps = []
     cross = axis.cross(off_p)
     dot = axis.dot(off_p)
-    print(f"{cross}, {dot}")
     for theta in np.arange(0, 360, 360/scale):
         cos = math.cos(math.radians(theta))
         sin = math.sin(math.radians(theta))
