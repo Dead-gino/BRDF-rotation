@@ -2,7 +2,6 @@ import numpy as np
 import points
 from points import Point
 import math
-from math import pi
 
 
 def find_axis_vertical(ps: list):

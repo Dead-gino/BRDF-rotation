@@ -109,9 +109,9 @@ class Point:
 
         :return: the altitude of self
         """
-        l = self.intensity()
+        i = self.intensity()
         z = self.z
-        phi = math.degrees(math.asin(z/l))
+        phi = math.degrees(math.asin(z/i))
         return phi
 
     def intensity(self):
@@ -127,11 +127,11 @@ class Point:
         :return: nothing, point itself is altered
         """
         azi = self.azimuth
-        alti = self.altitude
+        alt = self.altitude
         length = self.length
-        y = length * (math.sin(math.radians(azi)) * math.cos(math.radians(alti)))
-        x = length * (math.cos(math.radians(azi)) * math.cos(math.radians(alti)))
-        z = length * (math.sin(math.radians(alti)))
+        y = length * (math.sin(math.radians(azi)) * math.cos(math.radians(alt)))
+        x = length * (math.cos(math.radians(azi)) * math.cos(math.radians(alt)))
+        z = length * (math.sin(math.radians(alt)))
         self.x = x
         self.y = y
         self.z = z
@@ -218,12 +218,11 @@ class Point:
         x = self.x * magnitude
         y = self.y * magnitude
         z = self.z * magnitude
-        l = self.length * magnitude
+        i = self.length * magnitude
         self.x = x
         self.y = y
         self.z = z
-        self.length = l
-
+        self.length = i
 
 
 def zero():
@@ -304,37 +303,7 @@ def rasterize(ps: list, step: int):
     :return: 
     """
     for p in ps:
-        # phi_h = p.phi_h
-        # phi_v = p.phi_v
-        # new_v = __round_to_scale(phi_v, step)
-
-        # if new_v == 90:
-        #     new_h = 0
-        # else:
-        #     new_h = __round_to_scale(phi_h, step)
-        #
-        # if new_h == -180:
-        #     new_h = 180
-        # # print(f"from {p.phi_h} to {new_h}, and from {p.phi_v} to {new_v}")
-        # p.phi_h = new_h
-        # p.phi_v = new_v
-        #
-        # if p.azimuth % step != 0:
-        #     p.azimuth = __round_to_scale(p.azimuth, step)
-        # else:
-        #     p.azimuth = round(p.azimuth)
-        # if p.altitude % step != 0:
-        #     p.altitude = __round_to_scale(p.altitude, step)
-        # else:
-        #     p.altitude = round(p.altitude)
-        #
-        # if p.altitude == 90:  # points straight up, so azimuth does not matter; set azimuth to 0 for uniformity
-        #     p.azimuth = 0
-        # if p.azimuth == -180:  # azimuth -180 is equal to azimuth 180, both are 180 degrees away from azimuth 0
-        #     p.azimuth = 180
-        # p.update_coordinates()
         p.round_angles(step)
-        True
 
 
 def update_all(ps: list):
@@ -355,10 +324,4 @@ def __round_to_scale(num: float, scale: int):
     :param scale: the scale to round to
     :return: the number rounded to the given scale
     """
-    # half = scale/2
-    # div = num // scale
-    # if num % scale >= half:
-    #     return (div + 1) * scale
-    # else:
-    #     return div*scale
     return scale * round(round(num)/scale)

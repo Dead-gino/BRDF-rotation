@@ -18,31 +18,31 @@ def print_hi(name):
 
 
 def printer(ps: list):
-    for p in ps:
-        if isinstance(p, list):
-            printer(p)
-        elif isinstance(p, points.Point):
-            print(p)
+    for q in ps:
+        if isinstance(q, list):
+            printer(q)
+        elif isinstance(q, points.Point):
+            print(q)
 
 
 def cp(ps: list):
     pc = []
-    for p in ps:
-        pc.append(p)
+    for q in ps:
+        pc.append(q)
     return pc
 
 
-def coun(ps: list):
-    x = 0
+def count(ps: list):
+    i = 0
     prev = None
-    for p in ps:
+    for q in ps:
         if prev is None:
-            prev = p
-            x += 1
-        elif prev != p:
-            prev = p
-            x += 1
-    return x
+            prev = q
+            i += 1
+        elif prev != q:
+            prev = q
+            i += 1
+    return i
 
 
 def squash(nums):
@@ -191,7 +191,7 @@ if __name__ == '__main__':
     
     """
 
-    # turn solid of revolution into plotable data
+    # turn solid of revolution into plot-able data
     abc = points.convert_points(px)
     a = abc[0]
     b = abc[1]
