@@ -20,13 +20,24 @@ class Point:
                     represents the intensity of the light reflected in the direction of the vector in percentages
                     domain: [0,100]
     """
-    def __init__(self, x, y, z):
+    def __init__(self, x, y, z, leng=-1, altitude=-1, azimuth=-200):
         self.x = x
         self.y = y
         self.z = z
-        self.length = self.intensity()
-        self.altitude = self.angle_vertical()
-        self.azimuth = self.angle_horizontal()
+        if leng == -1:
+            self.length = self.intensity()
+        else:
+            self.length = leng
+
+        if altitude == -1:
+            self.altitude = self.angle_vertical()
+        else:
+            self.altitude = altitude
+
+        if azimuth == -200:
+            self.azimuth = self.angle_horizontal()
+        else:
+            self.azimuth = azimuth
 
     def __str__(self):
         return f"(x: {self.x}, y: {self.y}, z: {self.z}, " \
@@ -97,8 +108,8 @@ class Point:
 
         :return: the azimuth of self
         """
-        if self.altitude == 90:
-            return 0
+        # if self.altitude == 90:
+        #     return 0
         x = self.x
         y = self.y
         theta = math.degrees(math.atan2(y, x))
@@ -255,7 +266,7 @@ def from_angles(azimuth, altitude, length):
     x = length * (math.cos(math.radians(azimuth)) * math.cos(math.radians(altitude)))
     y = length * (math.sin(math.radians(azimuth)) * math.cos(math.radians(altitude)))
     z = length * (math.sin(math.radians(altitude)))
-    return Point(x, y, z)
+    return Point(x, y, z, length, altitude, azimuth)
 
 
 def create_points(xs, ys, zs):

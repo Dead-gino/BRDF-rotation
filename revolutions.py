@@ -208,3 +208,21 @@ def sub_curves_naive(ps: list):
             curves[ci].append(cur)
             prev = cur
         return curves
+
+
+def fill_domain(px: list, scale):
+    angs = []
+    ps = px.copy()
+    for p in px:
+        q = (p.azimuth, p.altitude)
+        angs.append(q)
+    for phi in np.arange(0, 90 + scale, scale):
+        for theta in np.arange(-180, 180 + scale, scale):
+            p = points.from_angles(theta, phi, 0)
+            q = (theta, phi)
+            if not(q in angs):
+                ps.append(p)
+    ps.sort()
+    # for p in ps:
+    #     print(p)
+    return ps
